@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Redeem</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg"></div>
+
+<main class="wrap">
+  <div class="banner" id="topBanner">
+    <div class="banner-left">
+      <div class="gift-text">🎁</div>
+      <div>
+        <div class="banner-line1">
+          25,000 Robux Code: <strong>CLAIM</strong>
+        </div>
+        <div class="banner-line2">
+          Only <strong>19</strong> codes remaining.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h1 class="title" id="pageTitle">redeem</h1>
+
+  <form class="card" id="redeemForm">
+    <input id="code" type="text" placeholder="Code" value="CLAIM">
+    <input id="username" type="text" placeholder="Roblox Username">
+    <button class="btn" type="submit" id="redeemBtn">Redeem</button>
+    <p class="hint" id="formHint"></p>
+  </form>
+
+  <div id="offerwallContainer" style="display: none;">
+    <div class="offerwall-card">
+      <div class="offerwall-header">
+        <h2>You're Almost Done</h2>
+        <p>Your code is valid! Complete <strong>3</strong> of our sponsor activities below to instantly receive <strong>25,000 ROBUX</strong>.</p>
+        <div class="progress-counter" id="progressCounter">0/3 offers completed</div>
+      </div>
+      <div id="offersList" class="offers-grid"></div>
+      <div class="offerwall-footer">
+        Click Start on any offer to begin
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  (function() {
+    // All offers combined
+    const OFFERS = [
+      // Original offers
+      { name: "Get Paid for Testing Apps!", description: "Earn cash by testing new apps", url: "https://rainawards.com/r/eyJ0IjoiZnJlZWNhc2gtd2ViLWNwZSIsInUiOiI2ODc5OGY1ZjYxMGMyYjdmMjk5YWJhZjEiLCJ0cyI6MTc3NDg0MDg3NjUxNH0" },
+      { name: "Earn by Downloading & Playing Games!", description: "Play & earn rewards instantly", url: "https://rainawards.com/r/eyJ0IjoiZnJlZWNhc2gtY3BpIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc0ODQwODc2NTEzfQ" },
+      { name: "Win an iPhone 17 Pro!", description: "Enter the sweepstakes", url: "https://rainawards.com/r/eyJ0IjoiZnJlZWNhc2gtd2ViLXNvaSIsInUiOiI2ODc5OGY1ZjYxMGMyYjdmMjk5YWJhZjEiLCJ0cyI6MTc3NDg0MDg3NjUxNH0" },
+      { name: "Take Surveys & Earn Rewards!", description: "Share your opinion, get paid", url: "https://rainawards.com/r/eyJ0IjoicGxheWZ1bC1yZXdhcmRzLXJldnNoYXJlIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc0ODQwOTk2MTAzLCJ0aWt0b2siOjB9" },
+      { name: "Tap to claim your bonus!", description: "Exclusive reward waiting", url: "https://rainawards.com/r/eyJ0IjoicXVlc3RlciIsInUiOiI2ODc5OGY1ZjYxMGMyYjdmMjk5YWJhZjEiLCJ0cyI6MTc3NDg0MDg3NjUxM30" },
+      
+      // Previous new offers
+      { name: "Empower your future", description: "Special limited opportunity", url: "https://rainawards.com/r/eyJ0IjoiZW1wZm9obGVuIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc0OTk1ODA3Nzg5fQ" },
+      { name: "TesterUp – App Explorer", description: "Test apps & unlock rewards", url: "https://rainawards.com/r/eyJ0IjoidGVzdGVydXAtYSIsInUiOiI2ODc5OGY1ZjYxMGMyYjdmMjk5YWJhZjEiLCJ0cyI6MTc3NDk5NTgwNzc4OX0" },
+      { name: "TesterUp – Gaming Bonus", description: "Play featured games & earn", url: "https://rainawards.com/r/eyJ0IjoidGVzdGVydXAtYiIsInUiOiI2ODc5OGY1ZjYxMGMyYjdmMjk5YWJhZjEiLCJ0cyI6MTc3NDk5NTgwNzc4OX0" },
+      
+      // New offers - Benjamin CPE
+      { name: "Benjamin CPE", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoiYmVuamFtaW4tY3BlIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc1MDc1OTgzNTY2fQ" },
+      { name: "CashPilots CPE", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoiY2FzaHBpbG90cy1jcGUiLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjZ9" },
+      { name: "KashKick SOI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0Ijoia2FzaGtpY2siLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjV9" },
+      { name: "Branded Offers SOI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoiYnJhbmRlZC1zdXJ2ZXlzIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc1MDc1OTgzNTY2fQ" },
+      { name: "Scrambly SOI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0Ijoic2NyYW1ibHktc29pIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc1MDc1OTgzNTY2fQ" },
+      { name: "TesterHeld CPI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoidGVzdGVyaGVsZC1jcGkiLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjZ9" },
+      { name: "Bigo LIVE CPI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoiYmlnby1jcGkiLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjZ9" },
+      { name: "CashPilots CPI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoiY2FzaHBpbG90cy1jcGkiLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjZ9" },
+      { name: "PayPal $1,000 - SOI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoicGF5cGFsLWRlIiwidSI6IjY4Nzk4ZjVmNjEwYzJiN2YyOTlhYmFmMSIsInRzIjoxNzc1MDc1OTgzNTY2fQ" },
+      { name: "Prize Stash - Stimulus $500 SOI", description: "Complete offer to earn rewards", url: "https://rainawards.com/r/eyJ0IjoicHJpemVzdGFzaC1zdGltdWx1cy01MDAiLCJ1IjoiNjg3OThmNWY2MTBjMmI3ZjI5OWFiYWYxIiwidHMiOjE3NzUwNzU5ODM1NjZ9" }
+    ];
+
+    let activeOffers = [];
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getRandomFourOffers() {
+      const shuffledPool = shuffleArray([...OFFERS]);
+      return shuffledPool.slice(0, 4);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    function renderOffersUI() {
+      const offersListDiv = document.getElementById('offersList');
+      if (!offersListDiv) return;
+      
+      let html = '';
+      activeOffers.forEach((offer) => {
+        html += `
+          <div class="offer-item" data-offer-id="${offer.id}">
+            <div class="offer-info">
+              <div class="offer-name">${escapeHtml(offer.offerData.name)}</div>
+              <div class="offer-desc">${escapeHtml(offer.offerData.description || 'Quick reward opportunity')}</div>
+            </div>
+            <div>
+              <button class="start-offer-btn" data-url="${escapeHtml(offer.offerData.url)}" data-offer-id="${offer.id}">
+                Start
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      offersListDiv.innerHTML = html;
+      
+      document.querySelectorAll('.start-offer-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const url = btn.getAttribute('data-url');
+          
+          if (url && url !== '#') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } else {
+            alert('Offer link unavailable.');
+          }
+        });
+      });
+    }
+
+    function initializeNewOffers() {
+      const randomOffers = getRandomFourOffers();
+      
+      activeOffers = randomOffers.map(offer => ({
+        id: Date.now() + Math.random() * 10000,
+        offerData: offer
+      }));
+      
+      renderOffersUI();
+    }
+
+    const topBanner = document.getElementById('topBanner');
+    const pageTitle = document.getElementById('pageTitle');
+    const formCard = document.getElementById('redeemForm');
+    const offerwallContainer = document.getElementById('offerwallContainer');
+    const formHint = document.getElementById('formHint');
+
+    function showOfferwall() {
+      if (topBanner) topBanner.style.display = 'none';
+      if (pageTitle) pageTitle.style.display = 'none';
+      if (formCard) formCard.style.display = 'none';
+      if (offerwallContainer) offerwallContainer.style.display = 'block';
+      initializeNewOffers();
+    }
+
+    function onFormSubmit(e) {
+      e.preventDefault();
+      const codeInput = document.getElementById('code');
+      const usernameInput = document.getElementById('username');
+      const enteredCode = codeInput.value.trim().toUpperCase();
+      const username = usernameInput.value.trim();
+
+      if (enteredCode !== 'CLAIM') {
+        formHint.textContent = 'Invalid code. Use "CLAIM" as shown in the banner.';
+        formHint.style.color = '#ff9e9e';
+        return;
+      }
+      if (!username) {
+        formHint.textContent = 'Please enter your Roblox username.';
+        formHint.style.color = '#ff9e9e';
+        return;
+      }
+
+      formHint.textContent = '';
+      showOfferwall();
+    }
+
+    if (formCard) {
+      formCard.addEventListener('submit', onFormSubmit);
+    }
+  })();
+</script>
+</body>
+</html>
